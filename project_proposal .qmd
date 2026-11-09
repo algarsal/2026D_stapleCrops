@@ -1,0 +1,150 @@
+---
+title: "Predicting Staple Crop Yields in Asia under Climate Variability: Reproducing and Extending a Regression and Machine Learning Analysis in R"
+subtitle: "Project Proposal"
+author:
+  - name: "Jayant Rai"
+  - name: "Ekaterine Dugashvili"
+  - name: "Ángel Costa Perales"
+  - name: "Anton Karl Philip Maria König"
+  - name: "Mari Tchagiashvili"
+date: 08-11-2026
+format:
+  html:
+    theme: minty
+    toc: true
+    toc-title: "Contents"
+    number-sections: true
+    code-fold: true
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+---
+
+# Group Members
+
+| Name                 | GitHub username                                 |
+|----------------------|-------------------------------------------------|
+| Jayant Rai           | [\@jayantrai12](https://github.com/jayantrai12) |
+| Ekaterine Dugashvili | [\@ekaterine-dugashvili](https://github.com/ekaterine-dugashvili) |
+| Ángel Costa Perales  | [\@Angelcosper](https://github.com/Angelcosper) |
+| Anton Karl Philip    | [\@Jesus-Mari](https://github.com/Jesus-Mari)   |
+| Mari Tchagiashvili    | [\@Maritchagi](https://github.com/Maritchagi)  |
+
+# Reference Paper
+
+Our project follows the published study below. Its analysis was done in **Python (Google Colab)**; we will reproduce it in **R** and then try to improve the results.
+
+-   **Title:** Predicting staple crop yields under climate variability using multiple regression techniques
+-   **Authors:** Richard D. Hortizuela and Thelma D. Palaoag
+-   **Journal:** Indonesian Journal of Electrical Engineering and Computer Science (IJEECS), 40(3), 1531–1538, 2025
+-   **DOI:** [10.11591/ijeecs.v40.i3.pp1531-1538](https://doi.org/10.11591/ijeecs.v40.i3.pp1531-1538)
+-   **Link:** <https://zenodo.org/records/18383599>
+
+**Summary.** Staple crops (rice, wheat, maize, potato, soybean, sugarcane) are vital for food security in Asia, but climate change threatens their yields. The paper studies how crop yield relates to rainfall, temperature and pesticide use, and builds predictive models with several regression techniques. Its main finding is that reliable yield predictions are possible even though the linear relationships between the variables are weak, and that **XGBoost** performed best (R² = 0.958367).
+
+# Description of the Data
+
+## Source
+
+The primary dataset is the **Crop Yield Prediction Dataset** on Kaggle (file `yield_df.csv`), which combines crop yield, rainfall, pesticide and temperature records (the paper's data statement also points to the FAO/FAOSTAT crop production data). The original Kaggle table covers countries worldwide for **1990–2013**.
+
+The paper then extends the analysis period to **2014–2022** by integrating data from two additional sources, and restricts the study to Asia.
+
+**Links to the data:**
+
+-   [Kaggle – Crop Yield Prediction Dataset (yield_df.csv)](https://www.kaggle.com/datasets/patelris/crop-yield-prediction-dataset/data?select=yield_df.csv)
+-   [FAOSTAT – Crop Production, Yield, Harvested Area and Processed (FAO catalog)](https://data.apps.fao.org/catalog/dataset/crop-production-yield-harvested-area-and-processed-global-national-annual-faostat/resource/baad642c-1067-4a94-85ff-9a664fffba58)
+
+> The Kaggle page also provides the component files used to build the table: `pesticides.csv`, `rainfall.csv`, `temp.csv`, `yield.csv` and `yield_df.csv`. We will upload our cleaned and extended version to our group GitHub repository and link it here.
+
+## Data preparation (following the paper)
+
+1.  Start from the original Kaggle data (**28,242 rows**).
+2.  Clean the data: remove null values, duplicates and outliers.
+3.  Keep **only Asian countries with complete and continuous records** over the study period (some Asian countries do not have complete records for 1990–2013).
+4.  Integrate two extra data sources to cover **2014–2022**.
+5.  Result: a final dataset of about **7,043 rows** for 1990–2022 (the number we need to match when reproducing the paper).
+
+## Structure of the data
+
+Each row represents one **country–year–crop** observation: the yield of one crop in one country in one year, together with the average rainfall, total pesticide use and average temperature of that country and year.
+
+```{r}
+#| label: load-data
+#| eval: false
+
+# Remove eval: false once the data is ready
+# data <- read.csv("yield_df.csv")
+# dim(data)       # original Kaggle file: 28,242 rows
+# str(data)
+# summary(data)
+```
+
+## Main variables
+
+| Variable | Type | Description |
+|------------------------|------------------|------------------------------|
+| Area | categorical | Country name (Asian countries only in the final data, e.g. Armenia, Azerbaijan, Bangladesh, India, Indonesia, Iraq, Japan, Kazakhstan, Lebanon, Malaysia, Nepal, Pakistan, Qatar, Saudi Arabia, Sri Lanka, Tajikistan, Thailand) |
+| Item | categorical | Staple crop (maize, potato, rice (paddy), soybean, wheat) |
+| Year | numeric (integer) | Year of the observation (1990–2022 in the final data) |
+| Average_rain_fall_mm_per_year | numeric | Average annual rainfall in millimetres |
+| Pesticides_tonnes | numeric | Total annual pesticide use in tonnes |
+| Avg_temp | numeric | Average temperature in degrees Celsius |
+| Hg/ha_yield | numeric | **Target variable:** crop yield in hectograms per hectare |
+
+# Objectives
+
+-   **General objective:** Develop and evaluate predictive models of staple crop yield in Asia from climate variables (rainfall, temperature) and pesticide use, supporting agricultural planning and food security. We first reproduce the published analysis in R and then try to improve it.
+-   **Specific objective 1:** Reproduce the data preparation of the paper (cleaning, restriction to Asia, extension to 2014–2022) and obtain a dataset that matches the original one in size and structure.
+-   **Specific objective 2:** Perform an exploratory data analysis of yield and its relationship with rainfall, temperature and pesticides.
+-   **Specific objective 3:** Fit the same set of regression models as the paper and compare them with the same evaluation metrics.
+-   **Specific objective 4:** Test whether additional or newer machine learning models can improve on the best published result (XGBoost, R² = 0.958).
+
+# Research Questions
+
+1.  How are crop yields distributed, and how do they relate to rainfall, temperature and pesticide use in Asia?
+2.  Can crop yield be predicted accurately from these variables, even if the linear relationships between them are weak?
+3.  Which regression technique (linear, regularised, SVR, tree-based or boosting) gives the best predictions?
+4.  Can we reproduce the results of the paper in R, and can newer machine learning models improve them?
+
+# Hypotheses
+
+-   **H1:** The yield distribution is right-skewed, and its relationships with rainfall, temperature and pesticides are weak and mostly non-linear.
+-   **H2:** Non-linear ensemble models (Random Forest, Gradient Boosting, XGBoost) predict yield better than linear models (linear regression, Ridge, Lasso, ElasticNet).
+-   **H3:** XGBoost gives the best performance among the models of the paper (highest R², lowest error), as reported by the authors.
+-   **H4:** Additional machine learning models and/or hyperparameter tuning can reach an R² equal to or higher than the published 0.958.
+
+# Planned Analyses
+
+These are the analyses we think we will need (this can change later):
+
+-   [ ] **Data wrangling:** merge the sources, remove nulls, duplicates and outliers, keep Asian countries with complete and continuous data (1990–2022).
+-   [ ] **Exploratory data analysis:** summary statistics, histogram of yield, scatterplots of yield vs. year, rainfall and temperature, and a correlation matrix. This shows the shape of the data and how weak the linear relationships are.
+-   [ ] **Preprocessing:** one-hot encoding of categorical variables (country, crop) and standard scaling of the numeric variables, so that all models can use the data.
+-   [ ] **Train/test split:** 70% training and 30% test, shuffled, with seed 40 (as in the paper).
+-   [ ] **Regression models:** linear regression with stochastic gradient descent, Ridge, Lasso, ElasticNet and Support Vector Regression (SVR), as linear and regularised baselines.
+-   [ ] **Ensemble models:** Random Forest, Gradient Boosting and XGBoost regressors, to capture non-linear patterns in the data.
+-   [ ] **Model evaluation:** MAE, median absolute error, MSE, RMSE, max error, R², explained variance score (EVS) and MAPE, to compare all models fairly.
+-   [ ] **Improvement step (new models):** try additional machine learning models, hyperparameter tuning and cross-validation, and compare with the paper's results (with GPU support for the heavier models).
+-   [ ] **Visualisation and conclusions:** plots of predicted vs. observed yield, model comparison charts and variable importance.
+
+Planned R tools: `tidyverse`, `ggplot2`, `caret` or `tidymodels`, `glmnet`, `e1071`, `randomForest`, `gbm` and `xgboost`.
+
+# Work Plan
+
+The work will be divided between the group members, so that everyone understands and can explain their own part in the final presentation.
+
+| Part | Responsible |
+|--------------------------------------------|----------------------|
+| Data preparation and cleaning (wrangling) | *to be decided* |
+| Regression models and scaling | *to be decided* |
+| Machine learning models | *to be decided* |
+| Machine learning improvements | *to be decided* |
+| Graphs, histograms, EDA and conclusions | *to be decided* |
+
+# References
+
+-   Hortizuela, R. D., & Palaoag, T. D. (2025). Predicting staple crop yields under climate variability using multiple regression techniques. *Indonesian Journal of Electrical Engineering and Computer Science*, 40(3), 1531–1538. <https://doi.org/10.11591/ijeecs.v40.i3.pp1531-1538>
+-   Crop Yield Prediction Dataset (Kaggle). <https://www.kaggle.com/datasets/patelris/crop-yield-prediction-dataset>
+-   FAOSTAT – Crop Production, Yield, Harvested Area and Processed (Crops – Crop Production, Yield and Harvested Area), Food and Agriculture Organization of the United Nations (FAO catalog). <https://data.apps.fao.org/catalog/dataset/crop-production-yield-harvested-area-and-processed-global-national-annual-faostat/resource/baad642c-1067-4a94-85ff-9a664fffba58>
