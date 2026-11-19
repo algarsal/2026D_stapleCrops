@@ -1,1 +1,7 @@
-dshflksljoigjrsoivjo
+df <- read.csv("Data Original/yield_df.csv")
+View(df)
+summary(df)
+colSums(is.na(df))
+unique_areas <- sort(unique(df$Area))
+print(unique_areas, max = length(unique_areas))
+length(unique_areas)
