@@ -35,4 +35,5 @@ years <- 1990:2020
      Wheat_country_clean <- Wheat_Raw %>% filter(Country %in% countires)
      
      #not finished, frist clean up of the crops, by counztry and year.
+     
 
