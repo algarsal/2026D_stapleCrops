@@ -17,23 +17,44 @@ years <- 1990:2020
    Potatoe_Raw <- read.csv("C:/Users/koeni/Desktop/Data_Semester.1_CSV_Files_FAO/Potatoe_Raw_FAO.csv")
      #2.a# remove countries we do not need
      Potatoe_country_clean <- Potatoe_Raw %>% filter(Country %in% countires)
+     #2.b# sellect years 1990 until 2020
+     Potatoe_year_clean <- Potatoe_country_clean %>% filter(Year %in% years)
 #3# Rice
      Rice_Raw <- read.csv("C:/Users/koeni/Desktop/Data_Semester.1_CSV_Files_FAO/Rice_Raw_FAO.csv")
      #3.a# remove countries we do not need
      Rice_country_clean <- Rice_Raw %>% filter(Country %in% countires)
+     #3.b# sellect years 1990 until 2020
+     Rice_year_clean <- Rice_country_clean %>% filter(Year %in% years)
 #4# Soy Bean
      Soy_Bean_Raw <- read.csv("C:/Users/koeni/Desktop/Data_Semester.1_CSV_Files_FAO/Soy_bean_Raw_FAO.csv")
      #4.a# remove countries we do not need
      Soy_Bean_country_clean <- Soy_Bean_Raw %>% filter(Country %in% countires)
+     #4.b# sellect years 1990 until 2020
+     Soy_Bean_year_clean <- Soy_Bean_country_clean %>% filter(Year %in% years)
 #5# Sugarcane 
      Sugarcane_Raw <- read.csv("C:/Users/koeni/Desktop/Data_Semester.1_CSV_Files_FAO/Sugar_Cain_Raw_FAO.csv")
      #5.a# remove countries we do not need
      Sugarcane_country_clean <- Sugarcane_Raw %>% filter(Country %in% countires)
+     #5.b# sellect years 1990 until 2020
+     Sugarcane_year_clean <- Sugarcane_country_clean %>% filter(Year %in% years)
 #6# Wheat
      Wheat_Raw <- read.csv("C:/Users/koeni/Desktop/Data_Semester.1_CSV_Files_FAO/Wheat_Raw_FAO.csv")
      #6.a# remove countries we do not need
      Wheat_country_clean <- Wheat_Raw %>% filter(Country %in% countires)
-     
-     #not finished, frist clean up of the crops, by counztry and year.
+     #6.b# sellect years 1990 until 2020
+     Wheat_year_clean <- Wheat_country_clean %>% filter(Year %in% years)
      
 
+     
+# Combination of all crops:
+     all_crops <- bind_rows(
+       Corn_year_clean,
+       Potatoe_year_clean,
+       Rice_year_clean,
+       Soy_Bean_year_clean,
+       Sugarcane_year_clean,
+       Wheat_year_clean
+     ) %>%
+       arrange(Item, Year)
+     
+View(all_crops)
