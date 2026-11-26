@@ -209,12 +209,12 @@ D.2_population_crop_correlation <- tibble(Crop_Variables = D_0_crop_variables) %
 print (D.2_population_crop_correlation, n = Inf)
 
 #D_3# Life_expectancy and 'Crop'
-  #only "Life_ecpectancy"
+  #only "Life_expectancy"
 
 D.3_Life_expectancy_crop_correlation <- tibble(Crop_Variables = D_0_crop_variables) %>%
   rowwise() %>% # setting up looped workflow, inside new table (D.1_gdp_crop_correlation...all different names), with one column for each variable (Rice_Yield/Production, Corn_Yield/...)
   mutate(       #adding new columns with the following names (r, p_value...)
-    test      = list(cor.test(FAO_WDI_ordered_data$Life_ecpectancy, 
+    test      = list(cor.test(FAO_WDI_ordered_data$Life_expectancy, 
                               FAO_WDI_ordered_data[[Crop_Variables]], 
                               method = "pearson")),
     r = round(test$estimate, 2),              #takes the result for 'r' from the actual test (test), and rounding it up to 2 decimals 
@@ -232,15 +232,15 @@ D.3_Life_expectancy_crop_correlation <- tibble(Crop_Variables = D_0_crop_variabl
   select(Crop_Variables, r, CI_95_low, CI_95_high, p_value, Signif) %>%
   arrange(desc(abs(r))) #sorting strongest correlation to weakest (easy overview of "useful" variables) 
 
-print (D.3_Life_expectancy_crop_correlation, n = Inf)
+print (D.3_Life_expectancy_crop_correlation, n = Inf) 
 
 #D_4# Secondary_education_LV and 'Crop'
   #only "Secondary_education_LV"
 
-D.2_population_crop_correlation <- tibble(Crop_Variables = D_0_crop_variables) %>%
+D.4_Secondary_education_LV_crop_correlation <- tibble(Crop_Variables = D_0_crop_variables) %>%
   rowwise() %>% # setting up looped workflow, inside new table (D.1_gdp_crop_correlation), with one column for each variable (Rice_Yield/Production, Corn_Yield/...)
   mutate(       #adding new columns with the following names (r, p_value...)
-    test      = list(cor.test(FAO_WDI_ordered_data$Population, 
+    test      = list(cor.test(FAO_WDI_ordered_data$Secondary_education_LV, 
                               FAO_WDI_ordered_data[[Crop_Variables]], 
                               method = "pearson")),
     r = round(test$estimate, 2),              #takes the result for 'r' from the actual test (test), and rounding it up to 2 decimals 
@@ -258,4 +258,11 @@ D.2_population_crop_correlation <- tibble(Crop_Variables = D_0_crop_variables) %
   select(Crop_Variables, r, CI_95_low, CI_95_high, p_value, Signif) %>%
   arrange(desc(abs(r))) #sorting strongest correlation to weakest (easy overview of "useful" variables) 
 
-print (D.2_population_crop_correlation, n = Inf)
+print (D.4_Secondary_education_LV_crop_correlation, n = Inf)
+
+
+#put all in files:
+write.table(D.1_gdp_crop_correlation, file = "CSV_Files_FAO/D.1_gdp_crop_correlation.csv")
+write.table(D.2_population_crop_correlation, file = "CSV_Files_FAO/D.2_population_crop_correlation.csv")
+write.table(D.3_Life_expectancy_crop_correlation, file = "CSV_Files_FAO/D.3_Life_expectancy_crop_correlation.csv")
+write.table(D.4_Secondary_education_LV_crop_correlation, file = "CSV_Files_FAO/D.4_Secondary_education_LV_crop_correlation.csv")
