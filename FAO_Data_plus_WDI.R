@@ -72,7 +72,7 @@ all_crops <- bind_rows(
 #########
 #B_0# opening WDI to introduce variables: GDP...
   
-  install.packages("WDI")
+  #install.packages("WDI")
 library(WDI)
 
 #B_1# define indicators of World Bank (give them usable names)
@@ -148,14 +148,114 @@ write.table(FAO_WDI_ordered_data, file = "CSV_Files_FAO/FAO_WDI_ordered_data.csv
 #Correlation between the variables#
 
 #D_0# correlation between:
-#library(corrplot)
-#D_1# GDP_per_capita and 'Crop'
+    #excluding non numerical variables (Country and Year), by creating Values with Variables we exclude
+D_0_wdi_variables <- c("GDP_per_capita", "Population", "Life_expectancy", "Secondary_education_LV")
 
-#corrplot(cor_matrix, )
+D_0_crop_variables <- FAO_WDI_ordered_data %>%
+  select(-Country, -Year, -all_of(D_0_wdi_variables)) %>%
+  names()
+
+
+#D_1# GDP_per_capita and 'Crop'
+    #only GDP--> Pearson's correlation GDP and crops Yield, Production 
+D.1_gdp_crop_correlation <- tibble(Crop_Variables = D_0_crop_variables) %>%
+  rowwise() %>% # setting up looped workflow, inside new table (D.1_gdp_crop_correlation), with one column for each variable (Rice_Yield/Production, Corn_Yield/...)
+  mutate(       #adding new columns with the following names (r, p_value...)
+    test      = list(cor.test(FAO_WDI_ordered_data$GDP_per_capita, 
+                              FAO_WDI_ordered_data[[Crop_Variables]], 
+                              method = "pearson")),
+    r = round(test$estimate, 2),              #takes the result for 'r' from the actual test (test), and rounding it up to 2 decimals 
+    CI_95_low = round (test$conf.int[1], 2),  #confidence interval, if it croses 0, we seethat this variable does not linearly predict the yield (variable)
+    CI_95_high = round(test$conf.int [2], 2), #confidence interval for high relation
+    p_value = round(test$p.value, 4),         #round p_value to 4 decimals 
+    Signif = case_when(
+      p_value < 0.001 ~ "high Sig.",
+      p_value < 0.01  ~ "medium Sig.",
+      p_value < 0.05  ~ "low Sig.",
+      TRUE            ~ "no Sig."
+    )
+  ) %>%
+  ungroup() %>% #sort and "clean" results
+select(Crop_Variables, r, CI_95_low, CI_95_high, p_value, Signif) %>%
+  arrange(desc(abs(r))) #sorting strongest correlation to weakest (easy overview of "useful" variables) 
+
+print (D.1_gdp_crop_correlation, n = Inf)
+
+
 
 #D_2# Population and 'Crop'
+    #only "Population"
+D.2_population_crop_correlation <- tibble(Crop_Variables = D_0_crop_variables) %>%
+  rowwise() %>% # setting up looped workflow, inside new table (D.1_gdp_crop_correlation), with one column for each variable (Rice_Yield/Production, Corn_Yield/...)
+  mutate(       #adding new columns with the following names (r, p_value...)
+    test      = list(cor.test(FAO_WDI_ordered_data$Population, 
+                              FAO_WDI_ordered_data[[Crop_Variables]], 
+                              method = "pearson")),
+    r = round(test$estimate, 2),              #takes the result for 'r' from the actual test (test), and rounding it up to 2 decimals 
+    CI_95_low = round (test$conf.int[1], 2),  #confidence interval, if it croses 0, we seethat this variable does not linearly predict the yield (variable)
+    CI_95_high = round(test$conf.int [2], 2), #confidence interval for high relation
+    p_value = round(test$p.value, 4),         #round p_value to 4 decimals 
+    Signif = case_when(
+      p_value < 0.001 ~ "high Sig.",
+      p_value < 0.01  ~ "medium Sig.",
+      p_value < 0.05  ~ "low Sig.",
+      TRUE            ~ "no Sig."
+    )
+  ) %>%
+  ungroup() %>% #sort and "clean" results
+  select(Crop_Variables, r, CI_95_low, CI_95_high, p_value, Signif) %>%
+  arrange(desc(abs(r))) #sorting strongest correlation to weakest (easy overview of "useful" variables) 
+
+print (D.2_population_crop_correlation, n = Inf)
 
 #D_3# Life_expectancy and 'Crop'
+  #only "Life_ecpectancy"
+
+D.3_Life_expectancy_crop_correlation <- tibble(Crop_Variables = D_0_crop_variables) %>%
+  rowwise() %>% # setting up looped workflow, inside new table (D.1_gdp_crop_correlation...all different names), with one column for each variable (Rice_Yield/Production, Corn_Yield/...)
+  mutate(       #adding new columns with the following names (r, p_value...)
+    test      = list(cor.test(FAO_WDI_ordered_data$Life_ecpectancy, 
+                              FAO_WDI_ordered_data[[Crop_Variables]], 
+                              method = "pearson")),
+    r = round(test$estimate, 2),              #takes the result for 'r' from the actual test (test), and rounding it up to 2 decimals 
+    CI_95_low = round (test$conf.int[1], 2),  #confidence interval, if it croses 0, we seethat this variable does not linearly predict the yield (variable)
+    CI_95_high = round(test$conf.int [2], 2), #confidence interval for high relation
+    p_value = round(test$p.value, 4),         #round p_value to 4 decimals 
+    Signif = case_when(
+      p_value < 0.001 ~ "high Sig.",
+      p_value < 0.01  ~ "medium Sig.",
+      p_value < 0.05  ~ "low Sig.",
+      TRUE            ~ "no Sig."
+    )
+  ) %>%
+  ungroup() %>% #sort and "clean" results
+  select(Crop_Variables, r, CI_95_low, CI_95_high, p_value, Signif) %>%
+  arrange(desc(abs(r))) #sorting strongest correlation to weakest (easy overview of "useful" variables) 
+
+print (D.3_Life_expectancy_crop_correlation, n = Inf)
 
 #D_4# Secondary_education_LV and 'Crop'
+  #only "Secondary_education_LV"
 
+D.2_population_crop_correlation <- tibble(Crop_Variables = D_0_crop_variables) %>%
+  rowwise() %>% # setting up looped workflow, inside new table (D.1_gdp_crop_correlation), with one column for each variable (Rice_Yield/Production, Corn_Yield/...)
+  mutate(       #adding new columns with the following names (r, p_value...)
+    test      = list(cor.test(FAO_WDI_ordered_data$Population, 
+                              FAO_WDI_ordered_data[[Crop_Variables]], 
+                              method = "pearson")),
+    r = round(test$estimate, 2),              #takes the result for 'r' from the actual test (test), and rounding it up to 2 decimals 
+    CI_95_low = round (test$conf.int[1], 2),  #confidence interval, if it croses 0, we seethat this variable does not linearly predict the yield (variable)
+    CI_95_high = round(test$conf.int [2], 2), #confidence interval for high relation
+    p_value = round(test$p.value, 4),         #round p_value to 4 decimals 
+    Signif = case_when(
+      p_value < 0.001 ~ "high Sig.",
+      p_value < 0.01  ~ "medium Sig.",
+      p_value < 0.05  ~ "low Sig.",
+      TRUE            ~ "no Sig."
+    )
+  ) %>%
+  ungroup() %>% #sort and "clean" results
+  select(Crop_Variables, r, CI_95_low, CI_95_high, p_value, Signif) %>%
+  arrange(desc(abs(r))) #sorting strongest correlation to weakest (easy overview of "useful" variables) 
+
+print (D.2_population_crop_correlation, n = Inf)
