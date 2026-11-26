@@ -15,4 +15,4 @@ cropss <- c("Maize","Potatoes","Rice, paddy","Soybeans","Wheat")
 dfra4 <- dfra3 [dfra3$Item %in% cropss, ] #2nd filter for selected crops
 #c4 <- c(unique(dfra4$Item)) #check for 2nd filter
 
-write.table(dfra4, file = "dfra4.csv")
+write.table(dfra4, file = "Data Original/dfra4.csv")
