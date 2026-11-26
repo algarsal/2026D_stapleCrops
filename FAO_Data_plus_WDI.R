@@ -136,6 +136,9 @@ FAO_WDI_ordered_data <- cleaned_crops_WDI %>%
   ) %>%
   arrange(Country, Year)
 
+write.table(FAO_WDI_ordered_data, file = "CSV_Files_FAO/FAO_WDI_ordered_data.csv")
+
+ 
 #View(FAO_WDI_ordered_data)
 
 
@@ -143,3 +146,16 @@ FAO_WDI_ordered_data <- cleaned_crops_WDI %>%
 
 #####
 #Correlation between the variables#
+
+#D_0# correlation between:
+#library(corrplot)
+#D_1# GDP_per_capita and 'Crop'
+
+#corrplot(cor_matrix, )
+
+#D_2# Population and 'Crop'
+
+#D_3# Life_expectancy and 'Crop'
+
+#D_4# Secondary_education_LV and 'Crop'
+
