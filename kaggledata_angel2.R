@@ -1,9 +1,17 @@
-install.packages("dplyr")
+# install.packages("dplyr")
 library(dplyr)
-df <- read.csv("Data Original/yield_df.csv") #read the csv file "FILENAME"
-View(df) #see if it's properly imported
-countr=c("Armenia", "Azerbaijan", "Bangladesh", "India", "Indonesia", "Iraq", 
-         "Japan", "Kazakhstan", "Lebanon", "Malaysia", "Nepal", "Pakistan", 
-         "Qatar", "Saudi Arabia", "Sri Lanka", "Tajikistan", "Thailand")
-df2 <- filter(df, "Area" == values(countr)) #filtro va mal?? ver como cambiarlo
-View(df2)
+dfra <- read.csv("Data Original/yield_df.csv") #read the csv file "FILENAME"
+#View(df) #see if it's properly imported
+
+# dfra$Area %in% countr #a filtering vector (true/false)
+# sum(dfra$Area %in% countr) #see if the vector works
+
+dfra3 <- dfra[dfra$Area %in% countr, ] #new dataframe with selected rows
+# View(dfra3) #see if it's properly filtered
+c3 <- c(unique(dfra$Item))
+
+cropss <- c("Maize","Potatoes","Rice, paddy","Soybeans","Wheat")
+
+dfra4 <- dfra3 [dfra3$Item %in% cropss, ] #2nd filter for selected crops
+#c4 <- c(unique(dfra4$Item)) #check for 2nd filter
+
